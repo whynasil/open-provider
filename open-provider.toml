@@ -1,0 +1,224 @@
+database_path = "open-provider.db"
+check_interval_minutes = 15
+
+[[providers]]
+name = "OpenRouter"
+base_url = "https://openrouter.ai"
+models_endpoint = "/api/v1/models"
+disabled = false
+
+[[providers]]
+name = "Kilo AI"
+base_url = "https://api.kilo.ai"
+models_endpoint = "/api/gateway/models"
+disabled = false
+
+[[providers]]
+name = "BluesMinds"
+base_url = "https://api.bluesminds.com"
+models_endpoint = "/v1/models"
+api_key_env = "BLUESMINDS_API_KEY"
+disabled = false
+
+[[providers]]
+name = "Vercel AI Gateway"
+base_url = "https://ai-gateway.vercel.sh"
+models_endpoint = "/v1/models"
+disabled = false
+
+[[providers]]
+name = "NVIDIA NIM"
+base_url = "https://integrate.api.nvidia.com"
+models_endpoint = "/v1/models"
+disabled = false
+
+[[providers]]
+name = "Chutes"
+base_url = "https://llm.chutes.ai"
+models_endpoint = "/v1/models"
+disabled = false
+
+[[providers]]
+name = "OpenCode Zen"
+base_url = "https://opencode.ai"
+models_endpoint = "/zen/v1/models"
+disabled = false
+
+[providers.headers]
+Accept = "application/json"
+
+[[providers]]
+name = "OpenCode Zen Go"
+base_url = "https://opencode.ai"
+models_endpoint = "/zen/go/v1/models"
+disabled = false
+
+[providers.headers]
+Accept = "application/json"
+
+[[providers]]
+name = "CommandCode"
+base_url = "https://api.commandcode.ai"
+models_endpoint = "/provider/v1/models"
+disabled = false
+
+[providers.headers]
+Accept = "application/json"
+
+[[providers]]
+name = "Ollama"
+base_url = "https://ollama.com"
+models_endpoint = "/api/tags"
+disabled = false
+
+[[providers]]
+name = "OpenAI"
+base_url = "https://api.openai.com"
+models_endpoint = "/v1/models"
+api_key_env = "OPENAI_API_KEY"
+disabled = true
+
+[[providers]]
+name = "Anthropic"
+base_url = "https://api.anthropic.com"
+models_endpoint = "/v1/models"
+api_key_env = "ANTHROPIC_API_KEY"
+disabled = true
+
+[[providers]]
+name = "Groq"
+base_url = "https://api.groq.com"
+models_endpoint = "/openai/v1/models"
+api_key_env = "GROQ_API_KEY"
+disabled = true
+
+[[providers]]
+name = "Together"
+base_url = "https://api.together.xyz"
+models_endpoint = "/v1/models"
+api_key_env = "TOGETHER_API_KEY"
+disabled = true
+
+[[providers]]
+name = "Mistral"
+base_url = "https://api.mistral.ai"
+models_endpoint = "/v1/models"
+api_key_env = "MISTRAL_API_KEY"
+disabled = true
+
+[[providers]]
+name = "Google"
+base_url = "https://generativelanguage.googleapis.com"
+models_endpoint = "/v1beta/models"
+api_key_env = "GOOGLE_API_KEY"
+disabled = true
+
+[[providers]]
+name = "Cohere"
+base_url = "https://api.cohere.ai"
+models_endpoint = "/v1/models"
+api_key_env = "COHERE_API_KEY"
+disabled = true
+
+[[providers]]
+name = "DeepSeek"
+base_url = "https://api.deepseek.com"
+models_endpoint = "/models"
+api_key_env = "DEEPSEEK_API_KEY"
+disabled = true
+
+[[providers]]
+name = "xAI"
+base_url = "https://api.x.ai"
+models_endpoint = "/v1/models"
+api_key_env = "XAI_API_KEY"
+disabled = true
+
+[[providers]]
+name = "Antigravity"
+base_url = "https://daily-cloudcode-pa.sandbox.googleapis.com"
+models_endpoint = "/v1internal:models"
+api_key_env = "ANTIGRAVITY_TOKEN"
+disabled = true
+
+[[providers]]
+name = "GitHub Copilot"
+base_url = "https://api.githubcopilot.com"
+models_endpoint = "/models"
+api_key_env = "GITHUB_COPILOT_TOKEN"
+disabled = true
+
+[providers.headers]
+editor-version = "vscode/1.107.1"
+Copilot-Integration-Id = "vscode-chat"
+editor-plugin-version = "copilot-chat/0.26.7"
+
+[[providers]]
+name = "Qwen Portal"
+base_url = "https://chat.qwen.ai"
+models_endpoint = "/api/models"
+api_key_env = "QWEN_PORTAL_TOKEN"
+disabled = true
+
+[[providers]]
+name = "SiliconFlow"
+base_url = "https://api.siliconflow.cn"
+models_endpoint = "/v1/models"
+api_key_env = "SILICONFLOW_API_KEY"
+disabled = true
+
+[[providers]]
+name = "Hyperbolic"
+base_url = "https://api.hyperbolic.xyz"
+models_endpoint = "/v1/models"
+api_key_env = "HYPERBOLIC_API_KEY"
+disabled = true
+
+[[providers]]
+name = "Nebius"
+base_url = "https://studio.nebius.ai"
+models_endpoint = "/api/models"
+api_key_env = "NEBIUS_API_KEY"
+disabled = true
+
+[[providers]]
+name = "Cerebras"
+base_url = "https://api.cerebras.ai"
+models_endpoint = "/v1/models"
+api_key_env = "CEREBRAS_API_KEY"
+disabled = true
+
+[[providers]]
+name = "Fireworks"
+base_url = "https://api.fireworks.ai"
+models_endpoint = "/v1/models"
+api_key_env = "FIREWORKS_API_KEY"
+disabled = true
+
+[[providers]]
+name = "Perplexity"
+base_url = "https://api.perplexity.ai"
+models_endpoint = "/models"
+api_key_env = "PERPLEXITY_API_KEY"
+disabled = true
+
+[[providers]]
+name = "NanoBanana"
+base_url = "https://api.nanobananaapi.ai"
+models_endpoint = "/v1/models"
+api_key_env = "NANOBANANA_API_KEY"
+disabled = true
+
+[[providers]]
+name = "AssemblyAI"
+base_url = "https://api.assemblyai.com"
+models_endpoint = "/v2/models"
+api_key_env = "ASSEMBLYAI_API_KEY"
+disabled = true
+
+[[providers]]
+name = "Codex"
+base_url = "https://api.codex-corp.com"
+models_endpoint = "/v1/models"
+api_key_env = "CODEX_API_KEY"
+disabled = true
