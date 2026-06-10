@@ -9,12 +9,18 @@ disabled = false
 
 [providers.free_rules]
 id_suffix_colon_free = true
+id_contains_free = true
+zero_pricing = true
 
 [[providers]]
 name = "Kilo AI"
 base_url = "https://api.kilo.ai"
 models_endpoint = "/api/gateway/models"
 disabled = false
+
+[providers.free_rules]
+field_is_free = true
+zero_pricing = true
 
 [[providers]]
 name = "BluesMinds"
@@ -49,6 +55,9 @@ disabled = false
 
 [providers.headers]
 Accept = "application/json"
+
+[providers.free_rules]
+id_contains_dash_free = true
 
 [[providers]]
 name = "OpenCode Zen Go"

@@ -30,10 +30,38 @@ fn make_slug(name: &str) -> String {
 }
 
 fn format_cell_value(key: &str, val: &str) -> String {
-    // Keep tokens/context as raw numbers
-    let _is_size_key = key.ends_with("length") || key.ends_with("tokens") || key.ends_with("context") || key == "max_completion_tokens";
     val.to_string()
 }
+
+fn cell_class(key: &str) -> &str {
+    if key.contains("description") || key.contains("desc") {
+        "col-desc"
+    } else if key.contains("_params") || key.contains("supported_") || key.contains("modalities") {
+        "col-trunc"
+    } else {
+        "col-muted"
+    }
+}
+
+// Icon helpers using Lucide SVG paths from icones.js.org
+const ICONS: &[(&str, &str)] = &[
+    ("key", "<circle cx=\"7.5\" cy=\"15.5\" r=\"5.5\"/><path d=\"m21 2-9.6 9.6\"/><path d=\"m15.5 7.5 3 3L22 7l-3-3\"/>"),
+    ("check", "<path d=\"M22 11.08V12a10 10 0 1 1-5.93-9.14\"/><path d=\"m9 11 3 3L22 4\"/>"),
+    ("x", "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m15 9-6 6\"/><path d=\"m9 9 6 6\"/>"),
+    ("refresh-cw", "<path d=\"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8\"/><path d=\"M21 3v5h-5\"/><path d=\"M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16\"/><path d=\"M3 21v-5h5\"/>"),
+    ("chevron-left", "<path d=\"m15 18-6-6 6-6\"/>"),
+    ("external-link", "<path d=\"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6\"/><polyline points=\"15 3 21 3 21 9\"/><line x1=\"10\" y1=\"14\" x2=\"21\" y2=\"3\"/>"),
+    ("clipboard-copy", "<rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\"/><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"/>"),
+];
+
+fn icon_svg(name: &str, size: u32, stroke: &str) -> String {
+    let path = ICONS.iter().find(|(n, _)| *n == name).map(|(_, p)| *p).unwrap_or("");
+    format!(r#"<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{stroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{path}</svg>"#)
+}
+
+fn icon(name: &str, size: u32) -> String { icon_svg(name, size, "currentColor") }
+fn icon_success(name: &str, size: u32) -> String { icon_svg(name, size, "hsl(142,76%,36%)") }
+fn icon_destructive(name: &str, size: u32) -> String { icon_svg(name, size, "hsl(0,62.8%,50%)") }
 
 async fn dashboard(State(state): State<AppState>) -> Html<String> {
     let (db, cfg) = &*state;
@@ -53,8 +81,8 @@ async fn dashboard(State(state): State<AppState>) -> Html<String> {
         let rt = s.response_time_ms.map(|n| format!("{}ms", n)).unwrap_or_else(|| "—".into());
         let lc = s.last_check_at.as_deref().unwrap_or("—");
         let key_badge = if s.requires_key {
-            r#"<span class="card-badge"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>API key</span>"#
-        } else { "" };
+            format!(r#"<span class="card-badge">{}API key</span>"#, icon("key", 11))
+        } else { String::new() };
         let err_html = s.error_message.as_deref().unwrap_or("");
         let err_div = if !err_html.is_empty() { format!(r#"<div class="card-error" title="{}">{}</div>"#, err_html, err_html) } else { String::new() };
         format!(r#"<a href="/provider/{slug}" class="card"><div class="card-top"><span class="card-name">{name}</span><span class="card-status {health_class}"></span></div><div class="card-details"><span>{mc} models · {rt}</span><span>Checked: {lc}</span></div>{key_badge}{err_div}</a>"#, name = s.name)
@@ -67,11 +95,12 @@ async fn dashboard(State(state): State<AppState>) -> Html<String> {
         let mc = c.get("model_count").and_then(|v| v.as_i64()).map(|n| format!("{}", n)).unwrap_or_else(|| "—".into());
         let err = c.get("error_message").and_then(|v| v.as_str()).unwrap_or("");
         let row_class = if healthy { "check-ok" } else { "check-fail" };
-        let status_html = if healthy {
-            r#"<span class="status-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="hsl(142, 76%, 36%)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>Pass</span>"#
+        let (status_icon, status_label) = if healthy {
+            (icon_success("check", 14), "Pass")
         } else {
-            r#"<span class="status-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="hsl(0, 62.8%, 50%)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>Fail</span>"#
+            (icon_destructive("x", 14), "Fail")
         };
+        let status_html = format!(r#"<span class="status-icon">{}{}</span>"#, status_icon, status_label);
         format!(r#"<tr class="{row_class}"><td>{name}</td><td>{time}</td><td>{status_html}</td><td>{ms}</td><td>{mc}</td><td class="error-cell" title="{err}">{err}</td></tr>"#)
     }).collect();
     let html = format!(r##"<!DOCTYPE html>
@@ -117,13 +146,15 @@ tr:last-child td{{border-bottom:none}}
 </style></head>
 <body>
 <h1>Open Provider</h1>
-<div class="subtitle">Monitoring {n} providers<button class="btn-icon" onclick="location.reload()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>Refresh</button></div>
+<div class="subtitle">Monitoring {n} providers<button class="btn-icon" onclick="location.reload()">{refresh_icon}Refresh</button></div>
 <div class="section-header"><span class="section-title">Providers</span></div>
 <div class="grid">{card_html}</div>
 <div class="section-header"><span class="section-title">Recent Checks</span><a href="/checks" class="btn-icon" style="text-decoration:none">View all →</a></div>
 <div class="table-wrap"><div class="table-wrap-inner"><table><thead><tr><th>Provider</th><th>Time</th><th>Status</th><th>Latency</th><th>Models</th><th>Error</th></tr></thead>
 <tbody>{check_rows}</tbody></table></div></div>
-</body></html>"##);
+</body></html>"##,
+        refresh_icon = icon("refresh-cw", 14),
+    );
     Html(html)
 }
 
@@ -155,12 +186,13 @@ async fn all_checks(State(state): State<AppState>) -> Html<String> {
         let mc = c.get("model_count").and_then(|v| v.as_i64()).map(|n| format!("{}", n)).unwrap_or_else(|| "—".into());
         let err = c.get("error_message").and_then(|v| v.as_str()).unwrap_or("");
         let row_class = if healthy { "check-ok" } else { "check-fail" };
-        let status_html = if healthy {
-            r##"<span class="status-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="hsl(142, 76%, 36%)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>Pass</span>"##
+        let (status_icon, status_label) = if healthy {
+            (icon_success("check", 14), "Pass")
         } else {
-            r##"<span class="status-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="hsl(0, 62.8%, 50%)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>Fail</span>"##
+            (icon_destructive("x", 14), "Fail")
         };
-        format!(r##"<tr class="{row_class}"><td>{name}</td><td>{time}</td><td>{status_html}</td><td>{ms}</td><td>{mc}</td><td class="error-cell" title="{err}">{err}</td></tr>"##)
+        let status_html = format!(r#"<span class="status-icon">{}{}</span>"#, status_icon, status_label);
+        format!(r#"<tr class="{row_class}"><td>{name}</td><td>{time}</td><td>{status_html}</td><td>{ms}</td><td>{mc}</td><td class="error-cell" title="{err}">{err}</td></tr>"#)
     }).collect();
     let html = format!(r###"<!DOCTYPE html>
 <html lang="en">
@@ -188,12 +220,14 @@ tr:last-child td{{border-bottom:none}}
 .error-cell{{max-width:220px;overflow:hidden;text-overflow:ellipsis;color:hsl(var(--destructive));font-size:11px}}
 </style></head>
 <body>
-<a class="back" href="/"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>Back to dashboard</a>
+<a class="back" href="/">{back_icon}Back to dashboard</a>
 <h1>All Checks</h1>
 <div class="table-wrap"><div class="table-wrap-inner">
 <table><thead><tr><th>Provider</th><th>Time</th><th>Status</th><th>Latency</th><th>Models</th><th>Error</th></tr></thead>
 <tbody>{rows}</tbody></table></div></div>
-</body></html>"###);
+</body></html>"###,
+        back_icon = icon("chevron-left", 14),
+    );
     Html(html)
 }
 
@@ -252,7 +286,8 @@ async fn provider_models(Path(slug): Path<String>, State(state): State<AppState>
                         other => format!("{}", other).replace('"', "&quot;"),
                     };
                     let display = format_cell_value(k, &s);
-                    cells.push(format!(r#"<td class="col-muted">{}</td>"#, display));
+                    let cls = cell_class(k);
+                    cells.push(format!(r#"<td class="{}" title="{}">{}</td>"#, cls, display.replace('"', "&quot;"), display));
                 }
             }
         }
@@ -270,14 +305,17 @@ async fn provider_models(Path(slug): Path<String>, State(state): State<AppState>
         format!("{}{}", pc.base_url.trim_end_matches('/'), pc.models_endpoint)
     }).unwrap_or_default();
     let api_url_html = if !api_full_url.is_empty() {
-        let escaped = api_full_url.replace('"', "&quot;");
-        format!(r#"<button class="copy-btn" onclick="copyId('{}',event)" title="Kopyala">📋</button><code class="api-url-code" onclick="copyId('{}',event)" title="Kopyalamak için tıkla">{}</code>"#, escaped, escaped, escaped)
+        let escaped = api_full_url.replace('"', "&quot;").replace('\'', "&#39;");
+        format!(
+            r#"<button class="copy-btn" onclick="copyId('{}',event)" title="Kopyala">📋</button><a class="api-url-code" href="{}" target="_blank" rel="noopener" onclick="copyId('{}',event)" title="Tıkla: kopyala, yeni sekmede aç">{}</a>"#,
+            escaped, escaped, escaped, escaped
+        )
     } else { String::new() };
     let needs_api_key = pc_ref.and_then(|pc| pc.api_key_env.as_ref()).is_some();
     let env_var = String::from("API_KEY");
     let api_key_badge = if needs_api_key {
         let env_name = pc_ref.and_then(|pc| pc.api_key_env.as_ref()).unwrap_or(&env_var);
-        format!(r#"<span class="badge"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>{} Required</span>"#, env_name)
+        format!(r#"<span class="badge">{}{} Required</span>"#, icon_svg("key", 10, "currentColor"), env_name)
     } else { String::new() };
     let html = format!(r###"<!DOCTYPE html>
 <html lang="en">
@@ -298,7 +336,7 @@ h1{{font-size:28px;font-weight:700;letter-spacing:-0.02em;margin-bottom:4px}}
 .status.down{{background:hsl(var(--destructive));box-shadow:0 0 0 3px hsla(var(--destructive)/.2)}}
 .api-endpoint{{margin:4px 0 8px 0}}
 .endpoint-row{{display:flex;align-items:center;gap:6px;font-size:13px;flex-wrap:wrap}}
-.api-url-code{{background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:4px;padding:4px 8px;font-family:'SF Mono','Fira Code','Fira Mono',monospace;font-size:12px;color:hsl(var(--primary));cursor:pointer;user-select:all}}
+.api-url-code{{background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:4px;padding:4px 8px;font-family:'SF Mono','Fira Code','Fira Mono',monospace;font-size:12px;color:hsl(var(--primary));cursor:pointer;user-select:all;text-decoration:none;display:inline-block}}
 .api-url-code:hover{{border-color:hsl(var(--ring))}}
 .copy-btn{{background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:4px;padding:3px 6px;cursor:pointer;font-size:14px;display:inline-flex;align-items:center;transition:all .15s;flex-shrink:0}}
 .copy-btn:hover{{color:hsl(var(--foreground));border-color:hsl(var(--ring));background:hsl(var(--accent))}}
@@ -306,15 +344,18 @@ h1{{font-size:28px;font-weight:700;letter-spacing:-0.02em;margin-bottom:4px}}
 .table-inner{{overflow-x:auto}}
 table{{width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap}}
 th,td{{padding:10px 14px;text-align:left;border-bottom:1px solid hsl(var(--border))}}
-th{{color:hsl(var(--muted-foreground));font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;background:hsl(var(--card));z-index:1}}
+th{{color:hsl(var(--muted-foreground));font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;background:hsl(var(--card));z-index:1;overflow:auto;resize:horizontal;min-width:60px}}
 tr:last-child td{{border-bottom:none}}
 .col-muted{{color:hsl(var(--muted-foreground))}}
+.col-trunc{{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}}
+.col-desc{{max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}}
 .mid{{color:hsl(var(--primary));cursor:pointer;user-select:all;font-size:12px;font-family:'SF Mono','Fira Code','Fira Mono',monospace;font-weight:500;padding:1px 4px;border-radius:3px;transition:background .1s}}
 .mid:hover{{background:hsla(var(--primary)/.15)}}
 .mid:active{{background:hsla(var(--primary)/.25)}}
 .toast{{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:hsl(var(--success));color:#fff;padding:8px 20px;border-radius:var(--radius);font-size:13px;font-weight:500;z-index:999;opacity:0;transition:opacity .2s;pointer-events:none}}
 .toast.show{{opacity:1}}
 .badge{{display:inline-flex;align-items:center;gap:5px;border-radius:calc(var(--radius) - 2px);padding:1px 8px;font-size:11px;font-weight:500;line-height:1.6;border:1px solid hsl(var(--border));background:hsl(var(--secondary));color:hsl(var(--secondary-foreground))}}
+.badge svg{{width:10px;height:10px}}
 .provider-link{{display:inline-flex;align-items:center;gap:5px;color:hsl(var(--muted-foreground));text-decoration:none;font-size:13px;transition:color .15s;font-weight:500}}
 .provider-link:hover{{color:hsl(var(--primary))}}
 .provider-link svg{{flex-shrink:0}}
@@ -329,12 +370,12 @@ tr:last-child td{{border-bottom:none}}
 </head>
 <body>
 <div id="toast" class="toast"></div>
-<a class="back" href="/"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>Back to dashboard</a>
+<a class="back" href="/">{back_icon}Back to dashboard</a>
 <h1>{name_f}</h1>
 <div class="meta">
 <span class="status {health_class}"></span>
 <span>{count} models · {latency}</span>
-<a class="provider-link" href="{provider_url_f}" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>{provider_url_f}</a>
+<a class="provider-link" href="{provider_url_f}" target="_blank" rel="noopener">{ext_icon}{provider_url_f}</a>
 {api_key_badge}
 </div>
 <div class="api-endpoint">
@@ -351,6 +392,8 @@ tr:last-child td{{border-bottom:none}}
         provider_url_f = provider_url, name_f = provider_name,
         health_class = health_class, latency = response_time, free_count = free_count,
         api_key_badge = api_key_badge, api_url_html = api_url_html,
+        back_icon = icon("chevron-left", 14),
+        ext_icon = icon("external-link", 12),
     );
     Html(html)
 }
