@@ -271,7 +271,7 @@ async fn provider_models(Path(slug): Path<String>, State(state): State<AppState>
     }).unwrap_or_default();
     let api_url_html = if !api_full_url.is_empty() {
         let escaped = api_full_url.replace('"', "&quot;");
-        format!(r#"<code class="api-url-code" onclick="copyId('{}',event)" title="Click to copy">{}</code><button class="copy-btn" onclick="copyId('{}',event)" title="Copy API URL"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>"#, escaped, escaped, escaped)
+        format!(r#"<button class="copy-btn" onclick="copyId('{}',event)" title="Kopyala">📋</button><code class="api-url-code" onclick="copyId('{}',event)" title="Kopyalamak için tıkla">{}</code>"#, escaped, escaped, escaped)
     } else { String::new() };
     let needs_api_key = pc_ref.and_then(|pc| pc.api_key_env.as_ref()).is_some();
     let env_var = String::from("API_KEY");
@@ -296,11 +296,11 @@ h1{{font-size:28px;font-weight:700;letter-spacing:-0.02em;margin-bottom:4px}}
 .status{{width:8px;height:8px;border-radius:50%;flex-shrink:0}}
 .status.healthy{{background:hsl(var(--success));box-shadow:0 0 0 3px hsla(var(--success)/.2)}}
 .status.down{{background:hsl(var(--destructive));box-shadow:0 0 0 3px hsla(var(--destructive)/.2)}}
-.api-endpoint{{margin-bottom:8px;font-size:13px;gap:8px}}
-.api-endpoint {{{{color:hsl(var(--muted-foreground))}}}}
+.api-endpoint{{margin:4px 0 8px 0}}
+.endpoint-row{{display:flex;align-items:center;gap:6px;font-size:13px;flex-wrap:wrap}}
 .api-url-code{{background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:4px;padding:4px 8px;font-family:'SF Mono','Fira Code','Fira Mono',monospace;font-size:12px;color:hsl(var(--primary));cursor:pointer;user-select:all}}
 .api-url-code:hover{{border-color:hsl(var(--ring))}}
-.copy-btn{{background:none;border:1px solid hsl(var(--border));border-radius:4px;padding:4px 6px;cursor:pointer;color:hsl(var(--muted-foreground));display:inline-flex;align-items:center;transition:all .15s}}
+.copy-btn{{background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:4px;padding:3px 6px;cursor:pointer;font-size:14px;display:inline-flex;align-items:center;transition:all .15s;flex-shrink:0}}
 .copy-btn:hover{{color:hsl(var(--foreground));border-color:hsl(var(--ring));background:hsl(var(--accent))}}
 .table-wrap{{background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius);overflow:hidden}}
 .table-inner{{overflow-x:auto}}
@@ -337,9 +337,8 @@ tr:last-child td{{border-bottom:none}}
 <a class="provider-link" href="{provider_url_f}" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>{provider_url_f}</a>
 {api_key_badge}
 </div>
-<div class="meta api-endpoint">
-<span class="endpoint-label">API endpoint</span>
-{api_url_html}
+<div class="api-endpoint">
+    <div class="endpoint-row">{api_url_html}</div>
 </div>
 <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('all')">All<span class="tab-count">{count}</span></button>
