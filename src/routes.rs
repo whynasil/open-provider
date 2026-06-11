@@ -222,7 +222,7 @@ tr:last-child td{{border-bottom:none}}
 .error-cell{{max-width:220px;overflow:hidden;text-overflow:ellipsis;color:hsl(var(--destructive));font-size:11px}}
 </style>
 <script>function copyId(id,e){{e.stopPropagation();navigator.clipboard.writeText(id).then(()=>{{let t=document.getElementById('toast');t.textContent='Copied: '+id;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}})}}
-(function(){{document.addEventListener('DOMContentLoaded',function(){{let ths=document.querySelectorAll('th');ths.forEach(th=>{{let h=document.createElement('div');h.className='resize-handle';th.appendChild(h);let startX,startW;h.addEventListener('mousedown',e=>{{e.preventDefault();e.stopPropagation();startX=e.pageX;startW=th.offsetWidth;h.classList.add('active');let onMove=ev=>{{let dx=ev.pageX-startX;th.style.width=(startW+dx)+'px';th.style.minWidth=(startW+dx)+'px'}};let onUp=()=>{{h.classList.remove('active');document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp)}};document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp)}})}})}})}})();
+(function(){{document.addEventListener('DOMContentLoaded',function(){{let ths=document.querySelectorAll('th');ths.forEach(th=>{{let h=document.createElement('div');h.className='resize-handle';th.appendChild(h);let startX,startW,idx=Array.from(th.parentElement.children).indexOf(th);h.addEventListener('mousedown',e=>{{e.preventDefault();e.stopPropagation();startX=e.pageX;startW=th.offsetWidth;h.classList.add('active');let onMove=ev=>{{let dx=ev.pageX-startX;let w=startW+dx;th.style.width=w+'px';th.style.minWidth=w+'px';document.querySelectorAll('tr td:nth-child('+(idx+1)+')').forEach(td=>td.style.maxWidth='none')}};let onUp=()=>{{h.classList.remove('active');document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp)}};document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp)}})}})}})}})();
 </script></head>
 <body>
 <a class="back" href="/">{back_icon}Back to dashboard</a>
@@ -354,8 +354,8 @@ th{{color:hsl(var(--muted-foreground));font-weight:500;font-size:11px;text-trans
 .resize-handle:hover,.resize-handle.active{{background:hsl(var(--primary))}}
 tr:last-child td{{border-bottom:none}}
 .col-muted{{color:hsl(var(--muted-foreground))}}
-.col-trunc{{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}}
-.col-desc{{max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}}
+.col-trunc{{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+.col-desc{{max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
 .mid{{color:hsl(var(--primary));cursor:pointer;user-select:all;font-size:12px;font-family:'SF Mono','Fira Code','Fira Mono',monospace;font-weight:500;padding:1px 4px;border-radius:3px;transition:background .1s}}
 .mid:hover{{background:hsla(var(--primary)/.15)}}
 .mid:active{{background:hsla(var(--primary)/.25)}}
@@ -374,7 +374,7 @@ tr:last-child td{{border-bottom:none}}
 .tab-count{{font-size:11px;color:hsl(var(--muted-foreground));font-weight:400;margin-left:4px}}
 </style>
 <script>function copyId(id,e){{e.stopPropagation();navigator.clipboard.writeText(id).then(()=>{{let t=document.getElementById('toast');t.textContent='Copied: '+id;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}})}}function switchTab(t){{document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');let all=document.querySelectorAll('tr.tab-free,tr.tab-paid');if(t==='free'){{all.forEach(r=>{{r.style.display=r.classList.contains('tab-free')?'table-row':'none'}})}}else{{all.forEach(r=>r.style.display='table-row')}}}}
-(function(){{document.addEventListener('DOMContentLoaded',function(){{let ths=document.querySelectorAll('th');ths.forEach(th=>{{let h=document.createElement('div');h.className='resize-handle';th.appendChild(h);let startX,startW;h.addEventListener('mousedown',e=>{{e.preventDefault();e.stopPropagation();startX=e.pageX;startW=th.offsetWidth;h.classList.add('active');let onMove=ev=>{{let dx=ev.pageX-startX;th.style.width=(startW+dx)+'px';th.style.minWidth=(startW+dx)+'px'}};let onUp=()=>{{h.classList.remove('active');document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp)}};document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp)}})}})}})}})();
+(function(){{document.addEventListener('DOMContentLoaded',function(){{let ths=document.querySelectorAll('th');ths.forEach(th=>{{let h=document.createElement('div');h.className='resize-handle';th.appendChild(h);let startX,startW,idx=Array.from(th.parentElement.children).indexOf(th);h.addEventListener('mousedown',e=>{{e.preventDefault();e.stopPropagation();startX=e.pageX;startW=th.offsetWidth;h.classList.add('active');let onMove=ev=>{{let dx=ev.pageX-startX;let w=startW+dx;th.style.width=w+'px';th.style.minWidth=w+'px';document.querySelectorAll('tr td:nth-child('+(idx+1)+')').forEach(td=>td.style.maxWidth='none')}};let onUp=()=>{{h.classList.remove('active');document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp)}};document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp)}})}})}})}})();
 </script>
 </head>
 <body>
