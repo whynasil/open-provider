@@ -211,14 +211,19 @@ h1{{font-size:24px;font-weight:700;letter-spacing:-0.02em;margin-bottom:20px}}
 .table-wrap-inner{{overflow-x:auto}}
 table{{width:100%;border-collapse:collapse;font-size:13px}}
 th,td{{padding:10px 14px;text-align:left;border-bottom:1px solid hsl(var(--border));white-space:nowrap}}
-th{{color:hsl(var(--muted-foreground));font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.05em;background:hsl(var(--card))}}
+th{{color:hsl(var(--muted-foreground));font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.05em;background:hsl(var(--card));position:relative;overflow:visible;min-width:60px;cursor:default}}
+.resize-handle{{position:absolute;right:0;top:0;bottom:0;width:5px;cursor:col-resize;z-index:2;transition:background .15s}}
+.resize-handle:hover,.resize-handle.active{{background:hsl(var(--primary))}}
 tr:last-child td{{border-bottom:none}}
 .check-ok td:first-child{{color:hsl(var(--success));font-weight:500}}
 .check-fail td:first-child{{color:hsl(var(--destructive));font-weight:500}}
 .status-icon{{display:inline-flex;align-items:center;gap:5px}}
 .status-icon svg{{width:14px;height:14px;flex-shrink:0}}
 .error-cell{{max-width:220px;overflow:hidden;text-overflow:ellipsis;color:hsl(var(--destructive));font-size:11px}}
-</style></head>
+</style>
+<script>function copyId(id,e){{e.stopPropagation();navigator.clipboard.writeText(id).then(()=>{{let t=document.getElementById('toast');t.textContent='Copied: '+id;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}})}}
+(function(){{document.addEventListener('DOMContentLoaded',function(){{let ths=document.querySelectorAll('th');ths.forEach(th=>{{let h=document.createElement('div');h.className='resize-handle';th.appendChild(h);let startX,startW;h.addEventListener('mousedown',e=>{{e.preventDefault();e.stopPropagation();startX=e.pageX;startW=th.offsetWidth;h.classList.add('active');let onMove=ev=>{{let dx=ev.pageX-startX;th.style.width=(startW+dx)+'px';th.style.minWidth=(startW+dx)+'px'}};let onUp=()=>{{h.classList.remove('active');document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp)}};document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp)}})}})}})}})();
+</script></head>
 <body>
 <a class="back" href="/">{back_icon}Back to dashboard</a>
 <h1>All Checks</h1>
@@ -344,7 +349,9 @@ h1{{font-size:28px;font-weight:700;letter-spacing:-0.02em;margin-bottom:4px}}
 .table-inner{{overflow-x:auto}}
 table{{width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap}}
 th,td{{padding:10px 14px;text-align:left;border-bottom:1px solid hsl(var(--border))}}
-th{{color:hsl(var(--muted-foreground));font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;background:hsl(var(--card));z-index:1;overflow:auto;resize:horizontal;min-width:60px}}
+th{{color:hsl(var(--muted-foreground));font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;background:hsl(var(--card));z-index:1;overflow:visible;min-width:60px;cursor:default}}
+.resize-handle{{position:absolute;right:0;top:0;bottom:0;width:5px;cursor:col-resize;z-index:2;transition:background .15s}}
+.resize-handle:hover,.resize-handle.active{{background:hsl(var(--primary))}}
 tr:last-child td{{border-bottom:none}}
 .col-muted{{color:hsl(var(--muted-foreground))}}
 .col-trunc{{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}}
@@ -366,7 +373,9 @@ tr:last-child td{{border-bottom:none}}
 .tab-btn.active{{color:hsl(var(--foreground));border-bottom-color:hsl(var(--primary))}}
 .tab-count{{font-size:11px;color:hsl(var(--muted-foreground));font-weight:400;margin-left:4px}}
 </style>
-<script>function copyId(id,e){{e.stopPropagation();navigator.clipboard.writeText(id).then(()=>{{let t=document.getElementById('toast');t.textContent='Copied: '+id;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}})}}function switchTab(t){{document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');let all=document.querySelectorAll('tr.tab-free,tr.tab-paid');if(t==='free'){{all.forEach(r=>{{r.style.display=r.classList.contains('tab-free')?'table-row':'none'}})}}else{{all.forEach(r=>r.style.display='table-row')}}}}</script>
+<script>function copyId(id,e){{e.stopPropagation();navigator.clipboard.writeText(id).then(()=>{{let t=document.getElementById('toast');t.textContent='Copied: '+id;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}})}}function switchTab(t){{document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');let all=document.querySelectorAll('tr.tab-free,tr.tab-paid');if(t==='free'){{all.forEach(r=>{{r.style.display=r.classList.contains('tab-free')?'table-row':'none'}})}}else{{all.forEach(r=>r.style.display='table-row')}}}}
+(function(){{document.addEventListener('DOMContentLoaded',function(){{let ths=document.querySelectorAll('th');ths.forEach(th=>{{let h=document.createElement('div');h.className='resize-handle';th.appendChild(h);let startX,startW;h.addEventListener('mousedown',e=>{{e.preventDefault();e.stopPropagation();startX=e.pageX;startW=th.offsetWidth;h.classList.add('active');let onMove=ev=>{{let dx=ev.pageX-startX;th.style.width=(startW+dx)+'px';th.style.minWidth=(startW+dx)+'px'}};let onUp=()=>{{h.classList.remove('active');document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp)}};document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp)}})}})}})}})();
+</script>
 </head>
 <body>
 <div id="toast" class="toast"></div>
